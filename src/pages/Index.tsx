@@ -1,13 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle, Book, User, Bell, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import MoodCheckin from "@/components/MoodCheckin";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
+  const [showMoodCheckin, setShowMoodCheckin] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -26,6 +27,12 @@ const Index = () => {
     if (formData.email && formData.password && formData.name) {
       setIsLoggedIn(true);
     }
+  };
+
+  const handleMoodCheckin = (mood: number, stress: number, energy: number) => {
+    console.log("Mood Check-in:", { mood, stress, energy });
+    setShowMoodCheckin(false);
+    // Here you would normally save the data
   };
 
   if (!isLoggedIn) {
@@ -133,6 +140,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
+      {showMoodCheckin && (
+        <MoodCheckin 
+          onComplete={handleMoodCheckin}
+          onClose={() => setShowMoodCheckin(false)}
+        />
+      )}
+
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -207,6 +221,38 @@ const Index = () => {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/journal">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-purple-500">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-purple-100 rounded-full p-3">
+                    <span className="text-2xl">📝</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-900">Jurnal Emosi</h3>
+                    <p className="text-gray-600 text-sm">Catat perasaan harian dan lacak progress emosional</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/relaxation">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-teal-500">
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-teal-100 rounded-full p-3">
+                    <span className="text-2xl">🎵</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-900">Relaksasi</h3>
+                    <p className="text-gray-600 text-sm">Musik dan suara alam untuk menenangkan pikiran</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Quick Actions */}
@@ -215,15 +261,33 @@ const Index = () => {
             <CardTitle className="text-lg">Aksi Cepat</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1">
-                <MessageCircle className="h-5 w-5" />
-                <span className="text-sm">Sesi Darurat</span>
-              </Button>
-              <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1">
-                <Heart className="h-5 w-5" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Button 
+                variant="outline" 
+                className="h-16 flex flex-col items-center justify-center space-y-1"
+                onClick={() => setShowMoodCheckin(true)}
+              >
+                <span className="text-2xl">😊</span>
                 <span className="text-sm">Mood Check</span>
               </Button>
+              <Link to="/achievements">
+                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                  <span className="text-2xl">🏆</span>
+                  <span className="text-sm">Pencapaian</span>
+                </Button>
+              </Link>
+              <Link to="/chat">
+                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                  <MessageCircle className="h-5 w-5" />
+                  <span className="text-sm">Sesi Darurat</span>
+                </Button>
+              </Link>
+              <Link to="/relaxation">
+                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                  <span className="text-2xl">🧘</span>
+                  <span className="text-sm">Meditasi</span>
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

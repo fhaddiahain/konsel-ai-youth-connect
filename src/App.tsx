@@ -9,6 +9,9 @@ import Chat from "./pages/Chat";
 import Education from "./pages/Education";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
+import Journal from "./pages/Journal";
+import Achievements from "./pages/Achievements";
+import Relaxation from "./pages/Relaxation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +28,9 @@ const App = () => (
           <Route path="/education" element={<Education />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/journal" element={<Journal />} />
+          <Route path="/achievements" element={<Achievements />} />
+          <Route path="/relaxation" element={<Relaxation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
