@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Heart, Clock, BookOpen, Star } from "lucide-react";
+import { ArrowLeft, Heart, Clock, BookOpen, Star, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,8 @@ interface Article {
   description: string;
   content: string;
   rating: number;
+  videoUrl: string;
+  videoTitle: string;
 }
 
 const Education = () => {
@@ -32,7 +34,9 @@ const Education = () => {
       difficulty: "Mudah",
       description: "Pelajari teknik pernapasan sederhana yang dapat membantu menenangkan pikiran dalam situasi cemas.",
       content: "Teknik pernapasan 4-7-8 adalah salah satu cara paling efektif untuk mengatasi kecemasan...",
-      rating: 4.8
+      rating: 4.8,
+      videoUrl: "https://www.youtube.com/embed/YRPh_GaiL8s",
+      videoTitle: "Panduan Teknik Pernapasan untuk Mengatasi Kecemasan"
     },
     {
       id: 2,
@@ -42,7 +46,9 @@ const Education = () => {
       difficulty: "Sedang",
       description: "Tips praktis untuk mengatasi tekanan sekolah dan tugas yang menumpuk.",
       content: "Stres akademik adalah hal yang wajar dialami setiap pelajar...",
-      rating: 4.6
+      rating: 4.6,
+      videoUrl: "https://www.youtube.com/embed/8jPQjjsBbIc",
+      videoTitle: "Cara Mengelola Stres Akademik untuk Pelajar"
     },
     {
       id: 3,
@@ -52,7 +58,9 @@ const Education = () => {
       difficulty: "Mudah",
       description: "Panduan langkah demi langkah untuk memulai praktik mindfulness.",
       content: "Mindfulness adalah praktik kesadaran penuh terhadap momen saat ini...",
-      rating: 4.9
+      rating: 4.9,
+      videoUrl: "https://www.youtube.com/embed/ZToicYcHIOU",
+      videoTitle: "Meditasi Mindfulness 10 Menit untuk Pemula"
     },
     {
       id: 4,
@@ -62,7 +70,9 @@ const Education = () => {
       difficulty: "Sedang",
       description: "Strategi untuk meningkatkan kepercayaan diri dan self-esteem.",
       content: "Kepercayaan diri adalah fondasi penting untuk kesuksesan...",
-      rating: 4.7
+      rating: 4.7,
+      videoUrl: "https://www.youtube.com/embed/w-HYZv6HzAs",
+      videoTitle: "Tips Membangun Kepercayaan Diri untuk Remaja"
     },
     {
       id: 5,
@@ -72,7 +82,9 @@ const Education = () => {
       difficulty: "Sedang",
       description: "Cara sehat untuk menyelesaikan masalah dengan teman.",
       content: "Konflik dalam pertemanan adalah hal yang normal...",
-      rating: 4.5
+      rating: 4.5,
+      videoUrl: "https://www.youtube.com/embed/BZlylmapOmw",
+      videoTitle: "Cara Sehat Mengatasi Konflik Pertemanan"
     },
     {
       id: 6,
@@ -82,7 +94,9 @@ const Education = () => {
       difficulty: "Mudah",
       description: "Praktik sederhana untuk meningkatkan kebahagiaan sehari-hari.",
       content: "Gratitude atau rasa syukur adalah salah satu cara paling efektif...",
-      rating: 4.8
+      rating: 4.8,
+      videoUrl: "https://www.youtube.com/embed/WPPPFqsECz0",
+      videoTitle: "Praktik Gratitude untuk Kebahagiaan Sehari-hari"
     }
   ];
 
@@ -147,6 +161,27 @@ const Education = () => {
             <CardContent>
               <div className="prose max-w-none">
                 <p className="text-lg text-gray-700 mb-6">{selectedArticle.description}</p>
+                
+                {/* Video Section */}
+                <div className="mb-8">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <Video className="h-5 w-5 text-red-500" />
+                    <h3 className="text-xl font-semibold text-gray-900">Video Edukasi</h3>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <div className="aspect-video w-full mb-3">
+                      <iframe
+                        src={selectedArticle.videoUrl}
+                        title={selectedArticle.videoTitle}
+                        className="w-full h-full rounded-lg"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 text-center">{selectedArticle.videoTitle}</p>
+                  </div>
+                </div>
                 
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                   <h3 className="font-semibold text-blue-900 mb-2">Apa yang akan kamu pelajari:</h3>
@@ -251,7 +286,7 @@ const Education = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-1">
                       <Clock className="h-4 w-4" />
@@ -267,11 +302,17 @@ const Education = () => {
                   </div>
                 </div>
                 
-                <div className="mt-4 flex items-center space-x-2">
-                  <BookOpen className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm text-blue-600 hover:underline">
-                    Baca Artikel
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <BookOpen className="h-4 w-4 text-blue-500" />
+                    <span className="text-sm text-blue-600 hover:underline">
+                      Baca Artikel
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1 text-red-500">
+                    <Video className="h-4 w-4" />
+                    <span className="text-sm">Video</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
