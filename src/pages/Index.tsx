@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Book, User, Bell, Shield, Heart } from "lucide-react";
+import { MessageCircle, Book, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import MoodCheckin from "@/components/MoodCheckin";
 import Header from "@/components/Header";
+import { AppSidebar } from "@/components/AppSidebar";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -294,153 +296,158 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
-      {showMoodCheckin && (
-        <MoodCheckin 
-          onComplete={handleMoodCheckin}
-          onClose={() => setShowMoodCheckin(false)}
-        />
-      )}
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-blue-50 to-blue-100">
+        <AppSidebar />
+        
+        <SidebarInset className="flex-1">
+          {showMoodCheckin && (
+            <MoodCheckin 
+              onComplete={handleMoodCheckin}
+              onClose={() => setShowMoodCheckin(false)}
+            />
+          )}
 
-      {/* New Header Component */}
-      <Header currentUser={currentUser} />
+          <Header currentUser={currentUser} />
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Selamat datang, {currentUser?.name || "Pengguna"}! 👋
-          </h2>
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-            <p className="font-medium">💡 Tip Kesehatan Mental Hari Ini</p>
-            <p className="text-sm mt-1 opacity-90">
-              Luangkan 5 menit untuk bernapas dalam-dalam. Pernapasan yang tenang dapat membantu mengurangi stres dan kecemasan.
-            </p>
-          </div>
-        </div>
+          {/* Main Content */}
+          <main className="max-w-4xl mx-auto px-4 py-8">
+            {/* Welcome Section */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Selamat datang, {currentUser?.name || "Pengguna"}! 👋
+              </h2>
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                <p className="font-medium">💡 Tip Kesehatan Mental Hari Ini</p>
+                <p className="text-sm mt-1 opacity-90">
+                  Luangkan 5 menit untuk bernapas dalam-dalam. Pernapasan yang tenang dapat membantu mengurangi stres dan kecemasan.
+                </p>
+              </div>
+            </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Link to="/chat">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-blue-100 rounded-full p-3">
-                    <MessageCircle className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">Mulai Konseling</h3>
-                    <p className="text-gray-600 text-sm">Bicara dengan AI counselor yang memahami perasaan Anda</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/education">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-green-500">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-green-100 rounded-full p-3">
-                    <Book className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">Konten Edukasi</h3>
-                    <p className="text-gray-600 text-sm">Akses artikel dan latihan untuk kesehatan mental</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/journal">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-purple-500">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-purple-100 rounded-full p-3">
-                    <span className="text-2xl">📝</span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">Jurnal Emosi</h3>
-                    <p className="text-gray-600 text-sm">Catat perasaan harian dan lacak progress emosional</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Link to="/relaxation">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-teal-500">
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-teal-100 rounded-full p-3">
-                    <span className="text-2xl">🎵</span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-gray-900">Relaksasi</h3>
-                    <p className="text-gray-600 text-sm">Musik dan suara alam untuk menenangkan pikiran</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Aksi Cepat</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button 
-                variant="outline" 
-                className="h-16 flex flex-col items-center justify-center space-y-1"
-                onClick={() => setShowMoodCheckin(true)}
-              >
-                <span className="text-2xl">😊</span>
-                <span className="text-sm">Mood Check</span>
-              </Button>
-              <Link to="/achievements">
-                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
-                  <span className="text-2xl">🏆</span>
-                  <span className="text-sm">Pencapaian</span>
-                </Button>
-              </Link>
+            {/* Feature Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <Link to="/chat">
-                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
-                  <MessageCircle className="h-5 w-5" />
-                  <span className="text-sm">Sesi Darurat</span>
-                </Button>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-blue-100 rounded-full p-3">
+                        <MessageCircle className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Mulai Konseling</h3>
+                        <p className="text-gray-600 text-sm">Bicara dengan AI counselor yang memahami perasaan Anda</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
-              <Link to="/relaxation">
-                <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
-                  <span className="text-2xl">🧘</span>
-                  <span className="text-sm">Meditasi</span>
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Crisis Hotline */}
-        <div className="mt-8 bg-pink-50 border border-pink-200 rounded-lg p-4">
-          <div className="flex items-center space-x-3">
-            <div className="bg-pink-500 rounded-full p-2">
-              <Shield className="h-5 w-5 text-white" />
+              <Link to="/education">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-green-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-green-100 rounded-full p-3">
+                        <Book className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Konten Edukasi</h3>
+                        <p className="text-gray-600 text-sm">Akses artikel dan latihan untuk kesehatan mental</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to="/journal">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-purple-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-purple-100 rounded-full p-3">
+                        <span className="text-2xl">📝</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Jurnal Emosi</h3>
+                        <p className="text-gray-600 text-sm">Catat perasaan harian dan lacak progress emosional</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to="/relaxation">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-teal-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-teal-100 rounded-full p-3">
+                        <span className="text-2xl">🎵</span>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Relaksasi</h3>
+                        <p className="text-gray-600 text-sm">Musik dan suara alam untuk menenangkan pikiran</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
-            <div>
-              <h4 className="font-semibold text-pink-900">Butuh Bantuan Segera?</h4>
-              <p className="text-sm text-pink-700">
-                Hubungi hotline krisis: <span className="font-semibold">119</span> atau 
-                <span className="font-semibold"> 021-7256526</span>
-              </p>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Aksi Cepat</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-16 flex flex-col items-center justify-center space-y-1"
+                    onClick={() => setShowMoodCheckin(true)}
+                  >
+                    <span className="text-2xl">😊</span>
+                    <span className="text-sm">Mood Check</span>
+                  </Button>
+                  <Link to="/achievements">
+                    <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                      <span className="text-2xl">🏆</span>
+                      <span className="text-sm">Pencapaian</span>
+                    </Button>
+                  </Link>
+                  <Link to="/chat">
+                    <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                      <MessageCircle className="h-5 w-5" />
+                      <span className="text-sm">Sesi Darurat</span>
+                    </Button>
+                  </Link>
+                  <Link to="/relaxation">
+                    <Button variant="outline" className="h-16 flex flex-col items-center justify-center space-y-1 w-full">
+                      <span className="text-2xl">🧘</span>
+                      <span className="text-sm">Meditasi</span>
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Crisis Hotline */}
+            <div className="mt-8 bg-pink-50 border border-pink-200 rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <div className="bg-pink-500 rounded-full p-2">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-pink-900">Butuh Bantuan Segera?</h4>
+                  <p className="text-sm text-pink-700">
+                    Hubungi hotline krisis: <span className="font-semibold">119</span> atau 
+                    <span className="font-semibold"> 021-7256526</span>
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </main>
-    </div>
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 };
 
