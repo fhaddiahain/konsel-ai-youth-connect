@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle, Book, User, Bell, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MoodCheckin from "@/components/MoodCheckin";
+import Header from "@/components/Header";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
@@ -302,31 +302,8 @@ const Index = () => {
         />
       )}
 
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-blue-100">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-500 rounded-full p-2">
-                <Heart className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-blue-900">KonselAI</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Link to="/notifications">
-                <Button variant="ghost" size="sm">
-                  <Bell className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/profile">
-                <Button variant="ghost" size="sm">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* New Header Component */}
+      <Header currentUser={currentUser} />
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
