@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle, Book, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,14 @@ const Index = () => {
     name: "",
     confirmPassword: ""
   });
+
+  // Check if user is already logged in when component mounts
+  useEffect(() => {
+    const currentUser = localStorage.getItem('konselai_current_user');
+    if (currentUser) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   // Check if user exists in localStorage
   const checkUserExists = (email: string) => {
