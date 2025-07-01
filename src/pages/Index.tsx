@@ -1,39 +1,152 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { MessageCircle, Book, User, Bell, Shield, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import MoodCheckin from "@/components/MoodCheckin";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [showMoodCheckin, setShowMoodCheckin] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    name: ""
+    name: "",
+    confirmPassword: ""
   });
+
+  // Check if user exists in localStorage
+  const checkUserExists = (email: string) => {
+    const users = JSON.parse(localStorage.getItem('konselai_users') || '[]');
+    return users.find((user: any) => user.email === email);
+  };
+
+  // Save user to localStorage
+  const saveUser = (userData: any) => {
+    const users = JSON.parse(localStorage.getItem('konselai_users') || '[]');
+    users.push(userData);
+    localStorage.setItem('konselai_users', JSON.stringify(users));
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.email && formData.password) {
-      setIsLoggedIn(true);
+    
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Error",
+        description: "Email dan kata sandi harus diisi!",
+        variant: "destructive"
+      });
+      return;
     }
+
+    const user = checkUserExists(formData.email);
+    if (!user) {
+      toast({
+        title: "Akun Tidak Ditemukan",
+        description: "Silakan daftar terlebih dahulu sebelum login!",
+        variant: "destructive"
+      });
+      setShowLogin(false); // Switch to registration form
+      return;
+    }
+
+    if (user.password !== formData.password) {
+      toast({
+        title: "Error",
+        description: "Kata sandi salah!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Login successful
+    localStorage.setItem('konselai_current_user', JSON.stringify(user));
+    setIsLoggedIn(true);
+    toast({
+      title: "Berhasil Login",
+      description: `Selamat datang kembali, ${user.name}!`,
+    });
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.email && formData.password && formData.name) {
-      setIsLoggedIn(true);
+    
+    if (!formData.email || !formData.password || !formData.name || !formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Semua field harus diisi!",
+        variant: "destructive"
+      });
+      return;
     }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Konfirmasi kata sandi tidak cocok!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Kata sandi minimal 6 karakter!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if user already exists
+    if (checkUserExists(formData.email)) {
+      toast({
+        title: "Email Sudah Terdaftar",
+        description: "Gunakan email lain atau login menggunakan akun yang sudah ada!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Register new user
+    const newUser = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      registeredAt: new Date().toISOString()
+    };
+
+    saveUser(newUser);
+    localStorage.setItem('konselai_current_user', JSON.stringify(newUser));
+    setIsLoggedIn(true);
+    
+    toast({
+      title: "Registrasi Berhasil",
+      description: `Selamat datang, ${newUser.name}! Akun Anda telah dibuat.`,
+    });
   };
 
   const handleMoodCheckin = (mood: number, stress: number, energy: number) => {
     console.log("Mood Check-in:", { mood, stress, energy });
     setShowMoodCheckin(false);
-    // Here you would normally save the data
+    toast({
+      title: "Mood Check-in Tersimpan",
+      description: "Terima kasih telah berbagi perasaan Anda hari ini!",
+    });
   };
+
+  // Get current user data
+  const getCurrentUser = () => {
+    const currentUser = localStorage.getItem('konselai_current_user');
+    return currentUser ? JSON.parse(currentUser) : null;
+  };
+
+  const currentUser = getCurrentUser();
 
   if (!isLoggedIn) {
     return (
@@ -72,14 +185,14 @@ const Index = () => {
               {!showLogin && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nama
+                    Nama Lengkap *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Masukkan nama Anda"
+                    placeholder="Masukkan nama lengkap Anda"
                     required
                   />
                 </div>
@@ -87,7 +200,7 @@ const Index = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  Email *
                 </label>
                 <input
                   type="email"
@@ -101,7 +214,7 @@ const Index = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Kata Sandi
+                  Kata Sandi *
                 </label>
                 <input
                   type="password"
@@ -110,11 +223,31 @@ const Index = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Masukkan kata sandi"
                   required
+                  minLength={6}
                 />
+                {!showLogin && (
+                  <p className="text-xs text-gray-500 mt-1">Minimal 6 karakter</p>
+                )}
               </div>
 
+              {!showLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Konfirmasi Kata Sandi *
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Konfirmasi kata sandi"
+                    required
+                  />
+                </div>
+              )}
+
               <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600">
-                {showLogin ? "Login" : "Daftar"}
+                {showLogin ? "Login" : "Daftar Sekarang"}
               </Button>
             </form>
 
@@ -127,11 +260,33 @@ const Index = () => {
               </div>
             )}
 
-            <div className="mt-6 text-center">
-              <button className="text-blue-500 text-sm hover:underline">
-                Lupa Kata Sandi?
-              </button>
-            </div>
+            {showLogin && (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Belum punya akun?{" "}
+                  <button 
+                    onClick={() => setShowLogin(false)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Daftar di sini
+                  </button>
+                </p>
+              </div>
+            )}
+
+            {!showLogin && (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Sudah punya akun?{" "}
+                  <button 
+                    onClick={() => setShowLogin(true)}
+                    className="text-blue-500 hover:underline"
+                  >
+                    Login di sini
+                  </button>
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -178,7 +333,7 @@ const Index = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Selamat datang, {formData.name || "Pengguna"}! 👋
+            Selamat datang, {currentUser?.name || "Pengguna"}! 👋
           </h2>
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
             <p className="font-medium">💡 Tip Kesehatan Mental Hari Ini</p>
