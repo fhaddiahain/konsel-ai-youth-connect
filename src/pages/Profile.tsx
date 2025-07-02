@@ -1,16 +1,28 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Bell, Shield, Moon, Sun, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  // Get current user data
+  const getCurrentUser = () => {
+    const currentUser = localStorage.getItem('konselai_current_user');
+    return currentUser ? JSON.parse(currentUser) : null;
+  };
+
+  const currentUser = getCurrentUser();
+  
   const [profile, setProfile] = useState({
-    name: "Pengguna",
-    email: "user@example.com",
+    name: currentUser?.name || "Pengguna",
+    email: currentUser?.email || "user@example.com",
     language: "id",
     theme: "light",
     notifications: true,
@@ -20,21 +32,52 @@ const Profile = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleSave = () => {
-    // Simulate saving profile
-    alert("Profil berhasil disimpan!");
+    // Update user data in localStorage
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        name: profile.name,
+        email: profile.email
+      };
+      localStorage.setItem('konselai_current_user', JSON.stringify(updatedUser));
+      
+      toast({
+        title: "Berhasil",
+        description: "Profil berhasil disimpan!",
+      });
+    }
   };
 
   const handleLogout = () => {
     if (confirm("Apakah Anda yakin ingin keluar?")) {
-      // Simulate logout
-      window.location.href = "/";
+      // Clear user data from localStorage
+      localStorage.removeItem('konselai_current_user');
+      
+      toast({
+        title: "Berhasil Keluar",
+        description: "Anda telah keluar dari aplikasi.",
+      });
+      
+      // Redirect to home page (which will show login/register form)
+      navigate("/");
     }
   };
 
   const handleDeleteData = () => {
     if (confirm("Apakah Anda yakin ingin menghapus semua data sesi? Tindakan ini tidak dapat dibatalkan.")) {
-      alert("Data sesi berhasil dihapus.");
+      // Clear all user data
+      localStorage.removeItem('konselai_current_user');
+      localStorage.removeItem('konselai_users');
+      
+      toast({
+        title: "Data Terhapus",
+        description: "Semua data sesi berhasil dihapus.",
+      });
+      
       setShowDeleteConfirm(false);
+      
+      // Redirect to home page
+      navigate("/");
     }
   };
 
