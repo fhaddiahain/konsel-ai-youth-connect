@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Book, Shield, Heart } from "lucide-react";
+import { MessageCircle, Book, Shield, Heart, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -346,6 +345,22 @@ const Index = () => {
                       <div>
                         <h3 className="font-semibold text-lg text-gray-900">Mulai Konseling</h3>
                         <p className="text-gray-600 text-sm">Bicara dengan AI counselor yang memahami perasaan Anda</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to="/srq29">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-indigo-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-indigo-100 rounded-full p-3">
+                        <Brain className="h-6 w-6 text-indigo-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Cek Kesehatan Emosi (SRQ-29)</h3>
+                        <p className="text-gray-600 text-sm">Isi kuesioner untuk mengetahui kondisi emosionalmu</p>
                       </div>
                     </div>
                   </CardContent>
