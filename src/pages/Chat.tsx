@@ -1,9 +1,11 @@
-
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, Send, AlertTriangle, Phone } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Send, AlertTriangle, Phone, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import CounselorSelection from "@/components/CounselorSelection";
+import { checkFreeTrialStatus, formatTrialRemainingTime } from "@/utils/freeTrialChecker";
 
 interface Message {
   id: number;
@@ -12,7 +14,16 @@ interface Message {
   timestamp: Date;
 }
 
+interface Counselor {
+  id: string;
+  name: string;
+  photo: string;
+  specialization: string;
+  status: 'online' | 'offline';
+}
+
 const Chat = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -23,7 +34,18 @@ const Chat = () => {
   ]);
   const [inputText, setInputText] = useState("");
   const [showCrisisAlert, setShowCrisisAlert] = useState(false);
+  const [selectedCounselor, setSelectedCounselor] = useState<Counselor | null>(null);
+  const [showCounselorSelection, setShowCounselorSelection] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Check free trial status
+  const getCurrentUser = () => {
+    const currentUser = localStorage.getItem('konselai_current_user');
+    return currentUser ? JSON.parse(currentUser) : null;
+  };
+
+  const user = getCurrentUser();
+  const trialStatus = user ? checkFreeTrialStatus(user.registeredAt) : { isActive: false, daysLeft: 0 };
 
   const crisisKeywords = ["bunuh diri", "mengakhiri hidup", "tidak ingin hidup", "sakit hati", "menyakiti diri", "putus asa"];
   
@@ -49,6 +71,31 @@ const Chat = () => {
   const checkForCrisis = (text: string): boolean => {
     const lowerText = text.toLowerCase();
     return crisisKeywords.some(keyword => lowerText.includes(keyword));
+  };
+
+  const handleSelectCounselor = (counselor: Counselor) => {
+    setSelectedCounselor(counselor);
+    // Save counselor selection to localStorage
+    localStorage.setItem('konselai_selected_counselor', JSON.stringify(counselor));
+  };
+
+  const handleStartCounseling = () => {
+    if (!trialStatus.isActive) {
+      navigate('/counseling-packages');
+      return;
+    }
+    
+    if (selectedCounselor) {
+      setShowCounselorSelection(false);
+      // Start counseling session
+      const welcomeMessage: Message = {
+        id: messages.length + 1,
+        text: `Halo! Saya ${selectedCounselor.name}, konselor spesialis ${selectedCounselor.specialization}. Saya siap membantu Anda hari ini. Bagaimana perasaan Anda saat ini?`,
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, welcomeMessage]);
+    }
   };
 
   const handleSendMessage = () => {
@@ -80,7 +127,9 @@ const Chat = () => {
       setTimeout(() => {
         const aiResponse: Message = {
           id: messages.length + 2,
-          text: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+          text: selectedCounselor 
+            ? `Terima kasih sudah berbagi. Sebagai konselor spesialis ${selectedCounselor.specialization}, saya memahami perasaan Anda. ${aiResponses[Math.floor(Math.random() * aiResponses.length)]}`
+            : aiResponses[Math.floor(Math.random() * aiResponses.length)],
           isUser: false,
           timestamp: new Date()
         };
@@ -164,22 +213,59 @@ const Chat = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center space-x-4">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">Sesi Konseling</h1>
-              <p className="text-sm text-gray-600">AI Counselor siap membantu</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link to="/">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">Sesi Konseling</h1>
+                <p className="text-sm text-gray-600">
+                  {selectedCounselor ? `Dengan ${selectedCounselor.name}` : 'AI Counselor siap membantu'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Free Trial Status */}
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4 text-orange-500" />
+              <Badge variant={trialStatus.isActive ? "default" : "destructive"}>
+                {trialStatus.isActive 
+                  ? `Gratis: ${formatTrialRemainingTime(trialStatus.daysLeft)}`
+                  : 'Masa gratis berakhir'
+                }
+              </Badge>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Chat Container */}
       <div className="max-w-4xl mx-auto px-4 py-4 h-[calc(100vh-120px)] flex flex-col">
+        {/* Counselor Selection */}
+        {showCounselorSelection && (
+          <Card className="mb-4">
+            <CardContent className="p-6">
+              <CounselorSelection 
+                onSelectCounselor={handleSelectCounselor}
+                selectedCounselor={selectedCounselor}
+              />
+              
+              <div className="mt-6 flex justify-center">
+                <Button 
+                  onClick={handleStartCounseling}
+                  disabled={!selectedCounselor}
+                  className="bg-blue-500 hover:bg-blue-600"
+                  size="lg"
+                >
+                  {trialStatus.isActive ? 'Mulai Konseling Gratis' : 'Lihat Paket Konseling'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Messages */}
         <div className="flex-1 overflow-y-auto mb-4 space-y-4">
           {messages.map((message) => (
@@ -210,34 +296,36 @@ const Chat = () => {
         </div>
 
         {/* Input Area */}
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <div className="flex space-x-3">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ketik pesan atau ceritakan perasaanmu..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!inputText.trim()}
-              className="bg-blue-500 hover:bg-blue-600"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="mt-3 flex justify-between items-center text-xs text-gray-500">
-            <span>💡 Semua percakapan bersifat rahasia dan anonim</span>
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="text-xs">
-                Akhiri Sesi
+        {!showCounselorSelection && (
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex space-x-3">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ketik pesan atau ceritakan perasaanmu..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputText.trim()}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                <Send className="h-4 w-4" />
               </Button>
-            </Link>
+            </div>
+            
+            <div className="mt-3 flex justify-between items-center text-xs text-gray-500">
+              <span>💡 Semua percakapan bersifat rahasia dan anonim</span>
+              <Link to="/">
+                <Button variant="ghost" size="sm" className="text-xs">
+                  Akhiri Sesi
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
