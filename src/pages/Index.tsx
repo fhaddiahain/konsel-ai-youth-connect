@@ -333,24 +333,8 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Feature Cards */}
+            {/* Feature Cards - Swapped positions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <Link to="/chat">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-blue-100 rounded-full p-3">
-                        <MessageCircle className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900">Mulai Konseling</h3>
-                        <p className="text-gray-600 text-sm">Bicara dengan AI counselor yang memahami perasaan Anda</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-
               <Link to="/srq29">
                 <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-indigo-500">
                   <CardContent className="p-6">
@@ -361,6 +345,22 @@ const Index = () => {
                       <div>
                         <h3 className="font-semibold text-lg text-gray-900">Cek Kesehatan Emosi (SRQ-29)</h3>
                         <p className="text-gray-600 text-sm">Isi kuesioner untuk mengetahui kondisi emosionalmu</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link to="/chat">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="bg-blue-100 rounded-full p-3">
+                        <MessageCircle className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900">Mulai Konseling</h3>
+                        <p className="text-gray-600 text-sm">Bicara dengan AI counselor yang memahami perasaan Anda</p>
                       </div>
                     </div>
                   </CardContent>
