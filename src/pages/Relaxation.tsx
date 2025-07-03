@@ -1,8 +1,8 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Square, Volume2 } from "lucide-react";
+import { Play, Pause, Square, Volume2, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import YouTube, { YouTubeProps } from "react-youtube";
 
 interface RelaxationTrack {
@@ -121,6 +121,19 @@ const Relaxation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 p-4">
       <div className="max-w-4xl mx-auto">
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link to="/">
+            <Button 
+              variant="outline" 
+              className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Kembali ke Beranda</span>
+            </Button>
+          </Link>
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">🧘 Relaksasi</h1>
           <p className="text-gray-600 text-lg">
