@@ -1,10 +1,10 @@
-
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Play, Pause, RotateCcw, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import YouTube from "react-youtube";
 
 interface RelaxationTrack {
   id: number;
@@ -13,6 +13,8 @@ interface RelaxationTrack {
   duration: string;
   category: string;
   audioUrl?: string;
+  youtubeId?: string;
+  icon: string;
 }
 
 const Relaxation = () => {
@@ -20,35 +22,44 @@ const Relaxation = () => {
   const [currentTrack, setCurrentTrack] = useState<RelaxationTrack | null>(null);
   const [volume, setVolume] = useState([70]);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const youtubePlayerRef = useRef<any>(null);
 
   const tracks: RelaxationTrack[] = [
     {
       id: 1,
-      title: "Suara Hujan Tenang",
+      title: "Hujan Tenang",
       description: "Suara hujan gerimis yang menenangkan untuk relaksasi",
       duration: "10:00",
-      category: "Alam"
+      category: "Alam",
+      youtubeId: "anqVTtWUZUM",
+      icon: "🌧️"
     },
     {
       id: 2,
-      title: "Gelombang Laut",
+      title: "Suara Ombak",
       description: "Suara ombak pantai yang damai",
       duration: "15:00",
-      category: "Alam"
+      category: "Alam",
+      youtubeId: "M6S-I1FqGGw",
+      icon: "🌊"
     },
     {
       id: 3,
-      title: "Hutan Tropis",
-      description: "Kicauan burung dan suara dedaunan",
+      title: "Angin Alam",
+      description: "Suara angin sepoi-sepoi di alam",
       duration: "12:00",
-      category: "Alam"
+      category: "Alam",
+      youtubeId: "kmhBZLd76L0",
+      icon: "🍃"
     },
     {
       id: 4,
-      title: "Meditasi Pernapasan",
-      description: "Panduan latihan pernapasan 4-7-8",
-      duration: "8:00",
-      category: "Guided"
+      title: "Musik Meditasi",
+      description: "Musik tenang untuk meditasi dan relaksasi",
+      duration: "20:00",
+      category: "Musik",
+      youtubeId: "FjHGZj2IjBk",
+      icon: "🎵"
     },
     {
       id: 5,
@@ -75,16 +86,70 @@ const Relaxation = () => {
 
   const handlePlayPause = (track: RelaxationTrack) => {
     if (currentTrack?.id === track.id) {
+      if (isPlaying) {
+        youtubePlayerRef.current?.pauseVideo();
+      } else {
+        youtubePlayerRef.current?.playVideo();
+      }
       setIsPlaying(!isPlaying);
     } else {
+      // Stop current track and start new one
+      if (youtubePlayerRef.current) {
+        youtubePlayerRef.current.stopVideo();
+      }
       setCurrentTrack(track);
       setIsPlaying(true);
     }
   };
 
   const handleStop = () => {
+    if (youtubePlayerRef.current) {
+      youtubePlayerRef.current.stopVideo();
+    }
     setIsPlaying(false);
     setCurrentTrack(null);
+  };
+
+  const onPlayerReady = (event: any) => {
+    youtubePlayerRef.current = event.target;
+    // Set volume
+    youtubePlayerRef.current.setVolume(volume[0]);
+    if (isPlaying) {
+      youtubePlayerRef.current.playVideo();
+    }
+  };
+
+  const onPlayerStateChange = (event: any) => {
+    if (event.data === 1) { // Playing
+      setIsPlaying(true);
+    } else if (event.data === 2) { // Paused
+      setIsPlaying(false);
+    } else if (event.data === 0) { // Ended
+      setIsPlaying(false);
+      setCurrentTrack(null);
+    }
+  };
+
+  const handleVolumeChange = (newVolume: number[]) => {
+    setVolume(newVolume);
+    if (youtubePlayerRef.current) {
+      youtubePlayerRef.current.setVolume(newVolume[0]);
+    }
+  };
+
+  const youtubeOpts = {
+    height: '0',
+    width: '0',
+    playerVars: {
+      autoplay: 1,
+      controls: 0,
+      disablekb: 1,
+      fs: 0,
+      iv_load_policy: 3,
+      modestbranding: 1,
+      rel: 0,
+      showinfo: 0,
+    },
   };
 
   return (
@@ -105,6 +170,18 @@ const Relaxation = () => {
           </div>
         </div>
       </header>
+
+      {/* Hidden YouTube Player */}
+      {currentTrack?.youtubeId && (
+        <div style={{ position: 'absolute', left: '-9999px' }}>
+          <YouTube
+            videoId={currentTrack.youtubeId}
+            opts={youtubeOpts}
+            onReady={onPlayerReady}
+            onStateChange={onPlayerStateChange}
+          />
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -133,6 +210,7 @@ const Relaxation = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-4">
+                <div className="text-2xl">{currentTrack.icon}</div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">{currentTrack.title}</h3>
                   <p className="text-sm text-gray-600">{currentTrack.description}</p>
@@ -155,7 +233,7 @@ const Relaxation = () => {
                 <Volume2 className="h-4 w-4 text-gray-500" />
                 <Slider
                   value={volume}
-                  onValueChange={setVolume}
+                  onValueChange={handleVolumeChange}
                   max={100}
                   step={1}
                   className="flex-1"
@@ -179,13 +257,19 @@ const Relaxation = () => {
               <CardContent className="p-4">
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      {currentTrack?.id === track.id && isPlaying ? (
-                        <Pause className="h-6 w-6 text-green-600" />
-                      ) : (
-                        <Play className="h-6 w-6 text-green-600" />
-                      )}
-                    </div>
+                    {track.icon ? (
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-2xl">
+                        {track.icon}
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        {currentTrack?.id === track.id && isPlaying ? (
+                          <Pause className="h-6 w-6 text-green-600" />
+                        ) : (
+                          <Play className="h-6 w-6 text-green-600" />
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-900 truncate">{track.title}</h3>
