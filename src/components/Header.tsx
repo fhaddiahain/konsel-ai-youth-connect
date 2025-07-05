@@ -34,10 +34,10 @@ const Header = ({ currentUser }: HeaderProps) => {
           <div className="flex items-center space-x-4">
             <SidebarTrigger className="h-8 w-8" />
             <div className="bg-green-500 rounded-lg p-2 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">KA</span>
+              <span className="text-white font-bold text-lg">CH</span>
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-gray-800">KonselAI</h1>
+              <h1 className="text-xl font-semibold text-gray-800">CURHATIN</h1>
               <p className="text-sm text-gray-500">Sistem Konseling Emosi Modern</p>
             </div>
           </div>
